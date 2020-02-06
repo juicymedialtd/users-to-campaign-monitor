@@ -28,13 +28,13 @@ if (!class_exists('UsersToCampaignMonitor')) {
 		    add_action('admin_init', array($this, 'settings'));
 			add_action('admin_menu', array($this, 'pages'));
 			add_filter('plugin_action_links_' . $this->plugin, function ($links) {
-                array_push( $links, '<a href="admin.php?page=users_to_campaign_monitor">Settings</a>' );
+                array_push( $links, '<a href="admin.php?page=users_to_campaign_monitor">' . __('Settings', 'utcm') . '</a>' );
                 return $links;
             });
 		}
 
 		public function pages() {
-            add_submenu_page('tools.php', 'Users to Campaign Monitor', 'Users to Campaign Monitor', 'manage_options', 'users-to-campaign-monitor', array($this, 'admin_index'));
+            add_submenu_page('tools.php', __('Users to Campaign Monitor', 'utcm'), __('Users to Campaign Monitor', 'utcm'), 'manage_options', 'users-to-campaign-monitor', array($this, 'admin_index'));
         }
 
         public function settings() {
