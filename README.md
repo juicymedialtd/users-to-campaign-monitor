@@ -14,7 +14,7 @@ define('UTCM_LIST_ID', '');
 ```
 
 * `UTCM_USERNAME` is the "Client API key" within the "Manage API Keys" section in Campaign Monitor.
-* `UTCM_LIST_ID` the "API Subscriber List ID" within the list edit page.
+* `UTCM_LIST_ID` is the "API Subscriber List ID" within the list edit page.
 
 Every time a new user is registered on your WordPress installation, a post request is executed to Campaign Monitor with the new user's email, first name and last name.
 
