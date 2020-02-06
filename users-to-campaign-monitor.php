@@ -16,6 +16,8 @@ if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
 	require_once dirname(__FILE__) . '/vendor/autoload.php';
 }
 
+use \Curl\Curl;
+
 if (!class_exists('UsersToCampaignMonitor')) {
 	class UsersToCampaignMonitor {
 	    public $plugin;
@@ -25,35 +27,23 @@ if (!class_exists('UsersToCampaignMonitor')) {
 		}
 
 		public function register() {
-		    add_action('admin_init', array($this, 'settings'));
-			add_action('admin_menu', array($this, 'pages'));
-			add_filter('plugin_action_links_' . $this->plugin, function ($links) {
-                array_push( $links, '<a href="admin.php?page=users_to_campaign_monitor">' . __('Settings', 'utcm') . '</a>' );
-                return $links;
-            });
+            add_action('user_register', array($this, 'hook'));
 		}
 
-		public function pages() {
-            add_submenu_page('tools.php', __('Users to Campaign Monitor', 'utcm'), __('Users to Campaign Monitor', 'utcm'), 'manage_options', 'users-to-campaign-monitor', array($this, 'admin_index'));
+        public function hook($id) {
+            $user = get_userdata($id);
+
+            $curl = new Curl();
+            $curl->setBasicAuthentication(UTCM_USERNAME, '');
+            $curl->setHeader('Content-Type', 'application/json');
+            $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . UTCM_LIST_ID . '.json', array(
+                'EmailAddress' => $user->data->user_email,
+                'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
+                'ConsentToTrack' => 'Yes'
+            ));
         }
 
-        public function settings() {
-		    $fields = ['utcm_username', 'utcm_list_id'];
-
-		    foreach ($fields as $field) {
-		        add_option($field, '');
-
-                register_setting('utcm_options_group', $field, function($value) {
-                    return sanitize_text_field($value);
-                });
-            }
-        }
-
-		public function admin_index() {
-			require_once plugin_dir_path( __FILE__ ) . 'templates/admin.php';
-		}
-
-		function activate() {
+		function status_change() {
             flush_rewrite_rules();
 		}
 	}
@@ -61,6 +51,6 @@ if (!class_exists('UsersToCampaignMonitor')) {
 	$usersToCampaignMonitor = new UsersToCampaignMonitor();
     $usersToCampaignMonitor->register();
 
-	register_activation_hook(__FILE__, array($usersToCampaignMonitor, 'activate'));
-	register_deactivation_hook(__FILE__, array('Deactivate', 'deactivate'));
+	register_activation_hook(__FILE__, array($usersToCampaignMonitor, 'status_change'));
+	register_deactivation_hook(__FILE__, array($usersToCampaignMonitor, 'status_change'));
 }
