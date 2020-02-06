@@ -25,6 +25,7 @@ if (!class_exists('UsersToCampaignMonitor')) {
 		}
 
 		public function register() {
+		    add_action('admin_init', array($this, 'settings'));
 			add_action('admin_menu', array($this, 'pages'));
 			add_filter('plugin_action_links_' . $this->plugin, function ($links) {
                 array_push( $links, '<a href="admin.php?page=users_to_campaign_monitor">Settings</a>' );
@@ -34,6 +35,18 @@ if (!class_exists('UsersToCampaignMonitor')) {
 
 		public function pages() {
             add_submenu_page('tools.php', 'Users to Campaign Monitor', 'Users to Campaign Monitor', 'manage_options', 'users-to-campaign-monitor', array($this, 'admin_index'));
+        }
+
+        public function settings() {
+		    $fields = ['utcm_username', 'utcm_list_id'];
+
+		    foreach ($fields as $field) {
+		        add_option($field, '');
+
+                register_setting('utcm_options_group', $field, function($value) {
+                    return sanitize_text_field($value);
+                });
+            }
         }
 
 		public function admin_index() {
@@ -48,9 +61,6 @@ if (!class_exists('UsersToCampaignMonitor')) {
 	$usersToCampaignMonitor = new UsersToCampaignMonitor();
     $usersToCampaignMonitor->register();
 
-	// activation
 	register_activation_hook(__FILE__, array($usersToCampaignMonitor, 'activate'));
-
-	// deactivation
 	register_deactivation_hook(__FILE__, array('Deactivate', 'deactivate'));
 }
