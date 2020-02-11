@@ -27,7 +27,19 @@ if (!class_exists('UsersToCampaignMonitor')) {
 		}
 
 		public function register() {
+            add_action('admin_init', array($this, 'settings'));
+
+            add_action('admin_menu', function() {
+                add_submenu_page('tools.php', 'Users to Campaign Monitor', 'Users to Campaign Monitor', 'manage_options', 'users-to-campaign-monitor', array($this, 'admin_index'));
+            });
+
+            add_filter('plugin_action_links_' . $this->plugin, function ($links) {
+                array_push($links, '<a href="admin.php?page=users_to_campaign_monitor">Settings</a>');
+                return $links;
+            });
+
             add_action('user_register', array($this, 'hook'));
+
 		}
 
         public function hook($id) {
@@ -43,7 +55,23 @@ if (!class_exists('UsersToCampaignMonitor')) {
             ));
         }
 
-		function status_change() {
+        public function settings() {
+            $fields = ['utcm_username', 'utcm_list_id'];
+
+            foreach ($fields as $field) {
+                add_option($field, '');
+
+                register_setting('utcm_options_group', $field, function($value) {
+                    return sanitize_text_field($value);
+                });
+            }
+        }
+
+        public function admin_index() {
+            require_once plugin_dir_path( __FILE__ ) . 'templates/admin.php';
+        }
+
+		public function status_change() {
             flush_rewrite_rules();
 		}
 	}
