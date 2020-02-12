@@ -39,7 +39,6 @@ if (!class_exists('UsersToCampaignMonitor')) {
             });
 
             add_action('user_register', array($this, 'hook'));
-
 		}
 
         public function hook($id) {
@@ -48,7 +47,7 @@ if (!class_exists('UsersToCampaignMonitor')) {
             $curl = new Curl();
             $curl->setBasicAuthentication(UTCM_USERNAME, '');
             $curl->setHeader('Content-Type', 'application/json');
-            $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . UTCM_LIST_ID . '.json', array(
+            $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . get_option('utcm_list_id') . '.json', array(
                 'EmailAddress' => $user->data->user_email,
                 'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
                 'ConsentToTrack' => 'Yes'
@@ -56,15 +55,11 @@ if (!class_exists('UsersToCampaignMonitor')) {
         }
 
         public function settings() {
-            $fields = ['utcm_username', 'utcm_list_id'];
+            add_option('utcm_list_id', '');
 
-            foreach ($fields as $field) {
-                add_option($field, '');
-
-                register_setting('utcm_options_group', $field, function($value) {
-                    return sanitize_text_field($value);
-                });
-            }
+            register_Setting('utcm_options_group', 'utcm_list_id', function($value) {
+                return sanitize_text_field($value);
+            });
         }
 
         public function admin_index() {
