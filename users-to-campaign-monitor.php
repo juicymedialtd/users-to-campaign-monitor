@@ -13,20 +13,20 @@ Text Domain: utcm
 defined('ABSPATH') || exit;
 
 if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
-	require_once dirname(__FILE__) . '/vendor/autoload.php';
+    require_once dirname(__FILE__) . '/vendor/autoload.php';
 }
 
 use \Curl\Curl;
 
 if (!class_exists('UsersToCampaignMonitor')) {
-	class UsersToCampaignMonitor {
-	    public $plugin;
+    class UsersToCampaignMonitor {
+        public $plugin;
 
-		public function __construct() {
-			$this->plugin = plugin_basename(__FILE__);
-		}
+        public function __construct() {
+            $this->plugin = plugin_basename(__FILE__);
+        }
 
-		public function register() {
+        public function register() {
             add_action('admin_init', array($this, 'settings'));
 
             add_action('admin_menu', function() {
@@ -39,21 +39,21 @@ if (!class_exists('UsersToCampaignMonitor')) {
             });
 
             add_action('user_register', array($this, 'hook'));
-		}
+        }
 
         public function hook($id) {
-			if (!empty(UTCM_USERNAME) && isset(UTCM_USERNAME) && !empty(get_option('utcm_list_id')) && isset(get_option('utcm_list_id'))) {
-	            $user = get_userdata($id);
+            if (!empty(UTCM_USERNAME) && UTCM_USERNAME !== null && !empty(get_option('utcm_list_id')) && get_option('utcm_list_id' !== null)) {
+                $user = get_userdata($id);
 
-	            $curl = new Curl();
-	            $curl->setBasicAuthentication(UTCM_USERNAME, '');
-	            $curl->setHeader('Content-Type', 'application/json');
-	            $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . get_option('utcm_list_id') . '.json', array(
-	                'EmailAddress' => $user->data->user_email,
-	                'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
-	                'ConsentToTrack' => 'Yes'
-	            ));
-			}
+                $curl = new Curl();
+                $curl->setBasicAuthentication(UTCM_USERNAME, '');
+                $curl->setHeader('Content-Type', 'application/json');
+                $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . get_option('utcm_list_id') . '.json', array(
+                    'EmailAddress' => $user->data->user_email,
+                    'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
+                    'ConsentToTrack' => 'Yes'
+                ));
+            }
         }
 
         public function settings() {
@@ -68,14 +68,14 @@ if (!class_exists('UsersToCampaignMonitor')) {
             require_once plugin_dir_path( __FILE__ ) . 'templates/admin.php';
         }
 
-		public function status_change() {
+        public function status_change() {
             flush_rewrite_rules();
-		}
-	}
+        }
+    }
 
-	$usersToCampaignMonitor = new UsersToCampaignMonitor();
+    $usersToCampaignMonitor = new UsersToCampaignMonitor();
     $usersToCampaignMonitor->register();
 
-	register_activation_hook(__FILE__, array($usersToCampaignMonitor, 'status_change'));
-	register_deactivation_hook(__FILE__, array($usersToCampaignMonitor, 'status_change'));
+    register_activation_hook(__FILE__, array($usersToCampaignMonitor, 'status_change'));
+    register_deactivation_hook(__FILE__, array($usersToCampaignMonitor, 'status_change'));
 }
