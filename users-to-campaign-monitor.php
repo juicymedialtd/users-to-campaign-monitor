@@ -42,16 +42,18 @@ if (!class_exists('UsersToCampaignMonitor')) {
 		}
 
         public function hook($id) {
-            $user = get_userdata($id);
+			if (!empty(UTCM_USERNAME) && isset(UTCM_USERNAME) && !empty(get_option('utcm_list_id')) && isset(get_option('utcm_list_id'))) {
+	            $user = get_userdata($id);
 
-            $curl = new Curl();
-            $curl->setBasicAuthentication(UTCM_USERNAME, '');
-            $curl->setHeader('Content-Type', 'application/json');
-            $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . get_option('utcm_list_id') . '.json', array(
-                'EmailAddress' => $user->data->user_email,
-                'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
-                'ConsentToTrack' => 'Yes'
-            ));
+	            $curl = new Curl();
+	            $curl->setBasicAuthentication(UTCM_USERNAME, '');
+	            $curl->setHeader('Content-Type', 'application/json');
+	            $curl->post('https://api.createsend.com/api/v3.2/subscribers/' . get_option('utcm_list_id') . '.json', array(
+	                'EmailAddress' => $user->data->user_email,
+	                'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
+	                'ConsentToTrack' => 'Yes'
+	            ));
+			}
         }
 
         public function settings() {
