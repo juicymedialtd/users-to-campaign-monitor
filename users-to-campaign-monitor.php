@@ -42,7 +42,7 @@ if (!class_exists('UsersToCampaignMonitor')) {
         }
 
         public function hook($id) {
-            if (!empty(UTCM_USERNAME) && UTCM_USERNAME !== null && !empty(get_option('utcm_list_id')) && get_option('utcm_list_id' !== null)) {
+            if (!empty(UTCM_USERNAME) && UTCM_USERNAME !== null && !empty(get_option('utcm_list_id')) && get_option('utcm_list_id') !== null) {
                 $user = get_userdata($id);
 
                 $curl = new Curl();
