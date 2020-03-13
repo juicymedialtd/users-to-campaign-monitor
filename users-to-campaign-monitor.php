@@ -34,7 +34,7 @@ if (!class_exists('UsersToCampaignMonitor')) {
             });
 
             add_filter('plugin_action_links_' . $this->plugin, function ($links) {
-                array_push($links, '<a href="admin.php?page=users_to_campaign_monitor">Settings</a>');
+                array_push($links, '<a href="admin.php?page=users-to-campaign-monitor">Settings</a>');
                 return $links;
             });
 
@@ -53,6 +53,8 @@ if (!class_exists('UsersToCampaignMonitor')) {
                     'Name' => get_user_meta($id, 'first_name', true) . ' ' . get_user_meta($id, 'last_name', true),
                     'ConsentToTrack' => 'Yes'
                 ));
+
+                file_put_contents(__DIR__ . '../../utcm_log.txt', date('D M d y h.i A') . ' -- ' . $user->data->user_email . ' -- ' . json_encode($curl->response) . PHP_EOL, FILE_APPEND | LOCK_EX);
             }
         }
 
