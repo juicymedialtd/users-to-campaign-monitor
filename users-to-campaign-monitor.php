@@ -61,7 +61,7 @@ if (!class_exists('UsersToCampaignMonitor')) {
         public function settings() {
             add_option('utcm_list_id', '');
 
-            register_Setting('utcm_options_group', 'utcm_list_id', function($value) {
+            register_setting('utcm_options_group', 'utcm_list_id', function($value) {
                 return sanitize_text_field($value);
             });
         }
